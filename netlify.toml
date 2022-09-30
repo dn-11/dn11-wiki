@@ -3,7 +3,7 @@
 
 [build]
   publish = "dist"
-  command = "pnpm docs:build"
+  command = "npx pnpm docs:build"
 
 [[redirects]]
   from = "/*"
