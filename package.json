@@ -1,0 +1,26 @@
+{
+  "name": "vitepress-dn11",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vitepress dev docs --port 8000",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs --port 8000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vitepress": "1.0.0-alpha.17",
+    "vue": "^3.2.40"
+  },
+  "pnpm": {
+  "peerDependencyRules": {
+      "ignoreMissing": [
+        "@algolia/client-search"
+      ]
+    }
+  }
+
+}
