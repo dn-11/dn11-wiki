@@ -3,7 +3,7 @@
 
 [build]
   publish = "dist"
-  command = "npm docs:build"
+  command = "npm run docs:build"
 
 [[redirects]]
   from = "/*"
