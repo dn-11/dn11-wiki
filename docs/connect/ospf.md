@@ -134,11 +134,21 @@ service bird start
 由于没有让 WireGuard 配置路由，在隧道 IP 地址中又选取了 /32 的网段，对端隧道 IP 和自己并不在一个子网，以至于没有到对面的隧道地址的路由，这才需要手动配置静态路由。
 :::
 
-进入 Openwrt 的`网络-静态路由`页面添加静态 IPv4 路由
+在 `/etc/bird.conf` 里的 `static` 协议里静态路由配置，示例如下：
 
-接口选择你正在配置的 WireGuard 接口，目标填写对方在 WireGuard 隧道的 IP，网关填写自己在 WireGuard 隧道的 IP，其他留空或保持默认，应用配置即可
+```nginx
+protocol static {
+    ipv4 {
+        import all;
+        export none;
+    };
+    route 172.16.128.2/32 via "wg0";
+```
 
-![static_route](/img/ospf/static_route.png)
+- `172.16.128.2/32` 应填写对端隧道 IP/32
+- `wg0` 应该填写为隧道网卡名称  
+
+这些配置在 static 协议里指定了到对端隧道 IP 的路由，然后将这些路由从 static 协议里 import 到 bird
 
 现在恭喜你完成了所有配置，没有意外的话稍等片刻应该就能访问到对面的网络了
 
