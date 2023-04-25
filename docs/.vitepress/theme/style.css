@@ -1,0 +1,153 @@
+/**
+* Customize default theme styling by overriding CSS variables:
+* https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
+*/
+@import url('https://fonts.loli.net/css2?family=Noto+Color+Emoji&family=Noto+Sans+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+/**
+* Colors
+* -------------------------------------------------------------------------- */
+
+.dark .vp-doc a,#loading, .dark .vp-doc a>code, .dark .VPNavBarMenuLink.VPNavBarMenuLink:hover, .dark .VPNavBarMenuLink.VPNavBarMenuLink.active, .dark .link.link:hover, .dark .link.link.active, .dark .edit-link-button.edit-link-button, .dark .pager-link .title {
+  color: var(--vp-c-brand-lighter);
+}
+
+:root {
+  --vp-c-brand: #0dadc4;
+  --vp-c-brand-light: #1A9CED;
+  --vp-c-brand-lighter: #1CA8FF;
+  --vp-c-brand-lightest: #5EB2E6;
+  --vp-c-brand-dark: #0B52BF;
+  --vp-c-brand-darker: #015F8F;
+  --vp-c-brand-dimm: rgba(100, 108, 255, 0.08);
+}
+
+:root {
+  --vp-font-family-base: 'Noto Sans SC', 'Noto Color Emoji', sans-serif;
+  --vp-font-family-mono: 'Noto Sans Mono', sans-serif, monospace, consolas;
+}
+
+/**
+* Component: Button
+* -------------------------------------------------------------------------- */
+
+:root {
+  --vp-button-brand-border: var(--vp-c-brand-light);
+  --vp-button-brand-text: var(--vp-c-white);
+  --vp-button-brand-bg: var(--vp-c-brand);
+  --vp-button-brand-hover-border: var(--vp-c-brand-light);
+  --vp-button-brand-hover-text: var(--vp-c-white);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-light);
+  --vp-button-brand-active-border: var(--vp-c-brand-light);
+  --vp-button-brand-active-text: var(--vp-c-white);
+  --vp-button-brand-active-bg: var(--vp-button-brand-bg);
+}
+
+/**
+* Component: Home
+* -------------------------------------------------------------------------- */
+
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(
+    120deg,
+    #08BAB6,
+    #1994E1,
+    #0B52BF
+  );
+
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    #08BAB6 50%,
+    #1994E1 50%,
+    #0B52BF 50%
+  );
+  --vp-home-hero-image-filter: blur(40px);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(56px);
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(72px);
+  }
+}
+
+/**
+* Component: Custom Block
+* -------------------------------------------------------------------------- */
+
+:root {
+  --vp-custom-block-tip-border: var(--vp-c-brand);
+  --vp-custom-block-tip-text: var(--vp-c-brand-darker);
+  --vp-custom-block-tip-bg: var(--vp-c-brand-dimm);
+}
+
+.dark {
+  --vp-custom-block-tip-border: var(--vp-c-brand);
+  --vp-custom-block-tip-text: var(--vp-c-brand-lightest);
+  --vp-custom-block-tip-bg: var(--vp-c-brand-dimm);
+}
+
+/**
+* Component: Algolia
+* -------------------------------------------------------------------------- */
+
+.DocSearch {
+  --docsearch-primary-color: var(--vp-c-brand) !important;
+}
+
+mjx-container {
+  display: inline-block;
+  margin: auto;
+}
+
+
+.VPHero .image-bg {
+  z-index: -1;
+  opacity: 0.8;
+  transition: opacity 1s ease;
+}
+
+.VPHero .image-container:hover .image-bg {
+  opacity: 1;
+}
+
+
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(
+    120deg,
+    var(--vp-c-brand) 30%,
+    var(--vp-c-brand-next)
+  );
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    var(--vp-c-brand) 30%,
+    var(--vp-c-brand-next)
+  );
+  --vp-home-hero-image-filter: blur(80px);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(120px);
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(120px);
+  }
+}
+
+/* Safari has a very bad performance on gradient and filter */
+.browser-safari, .browser-firefox {
+  --vp-home-hero-name-color: var(--vp-c-brand);
+  --vp-home-hero-name-background: transparent;
+  --vp-home-hero-image-background-image: transparent;
+  --vp-home-hero-image-filter: '';
+}
