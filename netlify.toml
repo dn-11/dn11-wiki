@@ -1,9 +1,9 @@
 [build.environment]
-  NODE_VERSION = "14"
+  NODE_VERSION = "16.14.0"
 
 [build]
   publish = "dist"
-  command = "npx pnpm docs:build"
+  command = "npm run docs:build"
 
 [[redirects]]
   from = "/*"
