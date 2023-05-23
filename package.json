@@ -1,5 +1,5 @@
 {
-  "name": "vitepress-dn11",
+  "name": "dn11-wiki",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,15 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "vitepress": "1.0.0-alpha.74",
-    "vue": "^3.2.47"
-  },
-  "pnpm": {
-  "peerDependencyRules": {
-      "ignoreMissing": [
-        "@algolia/client-search"
-      ]
-    }
+    "vitepress": "1.0.0-beta.1",
+    "vue": "^3.3.4"
   }
-
 }

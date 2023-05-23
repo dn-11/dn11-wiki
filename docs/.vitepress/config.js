@@ -41,7 +41,7 @@ export default {
     },
     footer: {
       message: 'Made with ❤️ by DN11 team',
-      copyright: 'Copyright © 2019-present Evan You && DN11 team'
+      copyright: 'Copyright © DN11 team'
     }
   }
 }
