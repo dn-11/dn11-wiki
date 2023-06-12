@@ -15,7 +15,7 @@ hero:
   text: Decentralized Network 11
   tagline: An intranet of Building 11
   image:
-    src: ./logo.png
+    src: logo.png
     alt: DN11
   actions:
     - theme: brand
