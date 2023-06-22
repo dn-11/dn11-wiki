@@ -15,6 +15,7 @@ export default {
         { text: '子网并入', link: '/connect/subnet' },
         { text: '单设备接入', link: '/connect/single' },
         { text: 'OSPF', link: '/connect/ospf' },
+        { text: 'BGP', link: '/connect/bgp' }
       ]
     },
     {
