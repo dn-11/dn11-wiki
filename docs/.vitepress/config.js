@@ -33,7 +33,8 @@ export default {
     {
       text: '其他',
       items: [
-        { text: 'DDNS', link: '/mics/ddns' }
+        { text: 'DDNS', link: '/mics/ddns' },
+        { text: 'DNS', link: '/mics/dns'}
       ]
     }
     ],
