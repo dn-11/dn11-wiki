@@ -231,18 +231,18 @@ https://www.iana.org/domains/root/db 这里是世界上完整的顶级域列表�
 ⑩：云服务器返回网页数据给PC浏览器、实现页面的访问
 
 
-### 配置pdns
+## 配置pdns
 
-#### 1.openwrt直接启动
+### 1.openwrt直接启动
 
-##### 装包
+#### 装包
 
 ```
 opkg update
 opkg install pdns pdns-backend-sqlite3 pdns-recursor sqlite3-cli
 ```
 
-##### 初始化数据库
+#### 初始化数据库
 
 创建文件
 
@@ -362,7 +362,7 @@ sqlite3 /etc/powerdns/pdns.sqlite3 < /usr/share/doc/pdns-backend-sqlite/schema.s
 chmod +r /etc/powerdns
 ```
 
-##### 配置pdns
+#### 配置pdns
 
 ```
 nano /etc/powerdns/pdns.conf
@@ -424,7 +424,7 @@ crontab -e
 
 这个的意思是一个定时脚本 每分钟检测一下 如果他开着 就给他关掉
 
-##### 启动pdns
+#### 启动pdns
 
 ```
 service pdns restart
@@ -465,6 +465,8 @@ source /etc/profile
 ; Warning - every name in this file is ABSOLUTE!
 $ORIGIN .
 ts.dn11 3600    IN      SOA     ns1.ts.dn11 hostmaster.ts.dn11 2023093018 60 30 604800 60
+ts.dn11 3600    IN      NS      ns1.ts.dn11.
+ns1.ts.dn11     3600    IN      A     172.16.3.53
 ts.dn11 60      IN      A       172.16.3.1
 ```
 
@@ -472,7 +474,7 @@ ts.dn11 60      IN      A       172.16.3.1
 
 最后一行就是给你的域名加一个A解析
 
-##### 验证
+#### 验证
 
 ```
 dig a ts.dn11 @172.16.3.53 -p 53
@@ -504,7 +506,7 @@ ts.dn11.                60      IN      A       172.16.3.1
 ;; MSG SIZE  rcvd: 52
 ```
 
-##### 配置TLD域、拉取同步
+#### 配置TLD域、拉取同步
 
 内网用户需要访问 http://172.16.7.102:8083/login （账号密码dn11）来配置自己的域名权威的ns指向
 
@@ -606,7 +608,7 @@ ts.dn11.                60      IN      NS      172.16.3.53.
 ;; MSG SIZE  rcvd: 61
 ```
 
-### 配置pdns_recursor
+#### 配置pdns_recursor
 
 ```
 nano /etc/powerdns/recursor.conf
@@ -669,7 +671,7 @@ forward-zones-recurse=dn11=172.16.3.53,.=223.5.5.5
 然后重启
 
 ```
-service pdns_recursor restart
+service pdns-recursor restart
 ```
 
 最后测试一下、请求一下网里存在的域名
@@ -699,7 +701,7 @@ op.iraze.dn11.          60      IN      A       172.16.2.2
 
 
 
-#### 2.docker拉镜像 装pdns-admin web界面管理
+### 2.docker拉镜像 装pdns-admin web界面管理
 
 ```
 [root@gs-fedora Pdns]# cat docker-compose.yml 
@@ -774,6 +776,71 @@ service system-resolve stop
 ip addr add 172.16.7.53 dev eno1
 ```
 
+这个key是我随便写的、你可以自己生成一个
+
 PDNS_api_key=0F34664B2C9CA2E1B84C5A6B4605C968
 
-在powerdns admin settings pdns中填写 填好后 在上层的PowerDNS server configuration & statistics里能看到一系列pdns的字段
+在powerdns admin settings pdns中填写这个key 填好后 在上层的PowerDNS server configuration & statistics里能看到一系列pdns的字段
+
+
+
+## 配置dns分流 MosDNS
+
+装包
+
+```
+opkg update
+opkg install mosdns
+```
+
+注意不要装 luci-app-mosdns 我感觉不好用
+
+改配置
+
+```
+nano /etc/mosdns/config.yaml
+```
+
+```
+log:
+  level: info
+  file: "/tmp/mosdns.log"
+
+api:
+  http: "0.0.0.0:9091"
+
+include: []
+
+plugins:
+  - tag: main_sequence
+    type: sequence
+    args:
+      # hdu内网dns解析
+      - matches: qname hdu.edu.cn
+        exec: forward 192.168.0.1:53
+      # dn11内网dns解析
+      - matches: qname dn11
+        exec: forward 172.16.255.53:5300
+      # 其他dns解析
+      - matches: "!qname hdu.edu.cn dn11"
+        exec: forward 223.5.5.5:53
+  # 启动端口和ip
+  - tag: udp_server_2
+    type: udp_server
+    args:
+      entry: main_sequence
+      listen: "172.16.3.13:53"
+
+  - tag: tcp_server_2
+    type: tcp_server
+    args:
+      entry: main_sequence
+      listen: "172.16.3.13:53"
+```
+
+同样的 启动需要你br-lan网卡里加一个 172.16.3.13这个ip地址
+
+```
+service mosdns restart
+```
+
