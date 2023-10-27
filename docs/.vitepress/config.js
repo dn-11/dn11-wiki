@@ -13,9 +13,8 @@ export default {
       text: '接入',
       items: [
         { text: '子网并入', link: '/connect/subnet' },
-        { text: '单设备接入', link: '/connect/single' },
-        { text: 'OSPF', link: '/connect/ospf' },
-        { text: 'BGP', link: '/connect/bgp' }
+        { text: 'BGP', link: '/connect/bgp' },
+        { text: 'IBGP', link: '/connect/ibgp' }
       ]
     },
     {
@@ -34,7 +33,13 @@ export default {
       text: '其他',
       items: [
         { text: 'DDNS', link: '/mics/ddns' },
-        { text: 'DNS', link: '/mics/dns'}
+        { text: 'DNS', link: '/mics/dns' }
+      ]
+    },
+    {
+      text: '废弃内容',
+      items: [
+        { text: 'ospf接入', link: '/dustbin/ospf' },
       ]
     }
     ],
