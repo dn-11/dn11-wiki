@@ -1,5 +1,6 @@
-# BGP
-原文链接:<https://baimeow.cn/posts/dn11/configurebgp/#配置隧道>
+# BGP组网
+
+原文链接:[https://baimeow.cn/posts/dn11/configurebgp/#配置隧道](https://baimeow.cn/posts/dn11/configurebgp/#%E9%85%8D%E7%BD%AE%E9%9A%A7%E9%81%93)
 
 DN11配网第二期，接上文 “使用 Bird2 配置 WireGuard + OSPF 实现网络的高可用”，这是一篇用于 DN11 的 BGP 配置教程
 
@@ -39,16 +40,16 @@ BGP 是用于连接不同 AS 的路由协议，现在定义每一个人选取自
 
 我给 openwrt 专门写了一个用来配置 wireguard 的工具，他会帮你处理开机启动，ddns 的问题的同时你可以使用 wg-quick 配置文件的所有配置。主要是基于 wg-quick-go 修改，定制了一些实用功能。
 
-github:<https://github.com/BaiMeow/wg-quick-op>
+github:[https://github.com/BaiMeow/wg-quick-op](https://github.com/BaiMeow/wg-quick-op)
 
 ### 配置隧道
 
-在`/etc/wireguard`下创建配置文件，一条隧道对应一个配置文件,配置文件命名为`xxx.conf`。下面给出配置文件示例:
+在 `/etc/wireguard`下创建配置文件，一条隧道对应一个配置文件,配置文件命名为 `xxx.conf`。下面给出配置文件示例:
+
 ```
 [Interface]
 PrivateKey = <PrivateKey>
 ListenPort = <Port>
-Address = <my tunnel IP>
 PostUp = /sbin/ip addr add dev %i <my tunnel IP> peer <another tunnel IP>
 Table = off
 
@@ -57,32 +58,35 @@ Endpoint = <EndPoint IP>
 PublicKey = <Public Key>
 AllowedIPs = 0.0.0.0/0
 ```
+
 这里主要参考了 DN42 的配置
 
-* PrivateKey 用`wg genkey`生成一个
+* PrivateKey 用 `wg genkey`生成一个
 * ListenPort wireguard监听端口，注意打开防火墙或者配置端口映射
-* Address 隧道IP，建议取网段的最后一个可用地址，比如 `172.16.4.254/32`, 无论多少拉多少条隧道都可以使用同一个隧道 IP ，这个 IP 仅 bird2 使用，注意不要给其他设备使用
 * PostUp 隧道建立时执行的命令，这个命令添加了一条对等路由，例如 `/sbin/ip addr add dev %i 172.16.4.254/32 peer 172.16.2.254/32`
 * Table = off 请务必使用 off，路由由 bird2 来接管，不需要 wireguard 创建
 * Endpoint 填对面的 IP 和监听的端口
 * PublicKey 填对面的公钥，公钥可用用 `wg pubkey`命令，然后粘贴公钥进去按 ctrl+d 获取
 * AllowedIPs 允许所有 IP 通过 Wireguard 接口
 
-使用`wg-quick-op up 接口名`来连接这个接口，没有意外的话，现在你能够 ping 通对面的对端IP了
+使用 `wg-quick-op up 接口名`来连接这个接口，没有意外的话，现在你能够 ping 通对面的对端IP了
 
 #### 故障排查
 
 ### STEP1
+
 首先你需要检查隧道有没有连接上，执行 `wg show 接口名`，看 latest handshake，如果握手时间在两分钟内都是正常的，如果大于两分钟或者没有这个字段，说明 wireguard 连接没有连上。
 
 这一般是因为端口没开，检查路由器的入站配置，如果是旁路由，还得检查一下端口映射是否正确。这也有可能是DNS记录的地址过期导致的，检查一下 wireguard 的 endpoint 地址是否确实是对面的IP地址。
 
 ### STEP2
+
 如果连接上了还是没有 ping 通，请检查路由表，有没有到对端的路由，并再次检查你的 wireguard 配置并重启接口
 
 ## BGP
 
 ### 配置 bird2
+
 > 本小节写给 bird2 用户，ros 和其他用户可供参考，但是依旧推荐阅读
 
 下面给出BGP配置示例，以下示例适用于AS内只有一台路由设备的配置，如果你的AS内有多个路由设备还要做不少额外配置，之后可以另外写一篇文章来谈谈这个问题
@@ -158,6 +162,7 @@ protocol bgp hakuya from BGP_peers {
     neighbor 172.16.0.254%hakuya as 4220081919;
 }
 ```
+
 所有相关配置指导已经写在配置文件里了，修改好覆盖bird原有的配置文件即可
 
 ### 添加更多邻居
@@ -173,15 +178,16 @@ protocol bgp hakuya from BGP_peers {
 将这一块内容复制粘贴在文件后面，再修改修改内容即可
 
 ### 故障排查
+
 **STEP1 检查 bird 配置文件时候有还未修改为自己的信息的地方**
 
 **STEP2 `birdc c` 应用配置了没有?**
 
-**STEP3 用`birdc s p`看看具体卡什么状态了，然后问问群友**
+**STEP3 用 `birdc s p`看看具体卡什么状态了，然后问问群友**
 
 ## End But not Ended
 
-现在 BGP 连接应该已经建立起来了，可以使用`birdc s p` 查看所有protocol的连接状态，一切顺利的话，你的 BGP 连接应该已经 Established 了
+现在 BGP 连接应该已经建立起来了，可以使用 `birdc s p` 查看所有protocol的连接状态，一切顺利的话，你的 BGP 连接应该已经 Established 了
 
 如果你的AS里有不少子网，这一切还只是折腾 BGP 的开始，在后面还有 BGP Large Community ，BGP confederation ，RR 等内容。
 
