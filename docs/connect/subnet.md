@@ -12,21 +12,109 @@
 
 ## 检查硬件设备
 
-检查你的网关设备是否支持wireguard
+检查你的网关设备是否支持WireGuard
 
 ::: tip
-目前DN11仅支持通过wireguard接入，后续会开放其他接入方式
+目前DN11仅支持通过WireGuard接入，后续会开放其他接入方式
 :::
 
-对于openwrt，请检查 `状态-WireGuard状态`是否存在，若不存在请考虑更换固件。具体更换什么固件可以向群友求助获得编译好的固件也可以自行编译。
+对于 openwrt 需要安装 `luci-app-wireguard` 包，使用web面板安装之后会连带一系列依赖。
+
+之后请检查 `状态-WireGuard状态`是否存在，若不存在请考虑更换固件。具体更换什么固件可以向群友求助获得编译好的固件也可以自行编译。
+
+::: details
+x86 推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt)
+
+其他架构可以考虑自行编译。
+:::
 
 ## 申请网段
 
-目前网段的申请放在 飞书 内的一个知识库内，可以申请到一个/24的网段
+::: danger
+建议大致浏览完 [bgp](/connect/bgp) 章节后再进行申请，能避免一些问题
+:::
 
-申请时请注意不要与他人的网段重叠，以免造成不可知的影响
+申请网段需要向 [dn11-registry](https://github.com/hdu-dn11/registry) 提交Pull Request
 
-## 切换网段
+### 成员注册
+
+您仅需要在 `as` 目录中创建一个 YAML 文件，文件名为 `<your-asn>.yml`，然后以 [`example.yml`](https://github.com/hdu-dn11/registry/blob/main/as/example.yml) 为模板填写。填写完成后提交一个 PR，根据 Checker 回复修改您的配置，然后等待管理员合并即可。
+
+- `ASN`
+
+  **必填**（文件名）
+
+  格式为 `421111xxxx` 或 `422008xxxx` (仅 Vidar 成员)
+
+  后四位任选，无冲突即可。
+
+- `name`
+
+  **必填**
+
+  您的名字 / ID
+
+- `contact`
+
+  **必填** (为非个人注册时除外)
+
+  联系方式，如 QQ / Email
+
+  如使用 QQ 号等纯数字，请使用引号包裹，确保该项的值为字符串。
+
+- `ip`
+
+  **必填**，可多个
+
+  您所使用的 IP 段
+
+  DN11 默认从 `172.16.0.0/16` 段中使用 `/24` 作为成员段。请优先选择该段内的最小一个未使用的 `/24` 地址。
+
+  您可在 [信息表](https://github.com/hdu-dn11/metadata/blob/main/README.md) 中查看已使用的 IP 段。
+
+  如您确需使用其他 IP，请在群中说明情况。
+
+- `domain`
+
+  **选填**
+
+  可在此处注册您的域名，以便我们为您生成 Zone 文件。
+
+  如注册域名，则每个域名至少提供一个 NS 记录的 IP 地址。
+
+- `ns`
+
+  **选填**
+
+  可在此处注册您的 NS 记录，以便我们为您生成 Zone 文件。
+
+  每个 NS 记录对应一个 IP 地址。
+
+  请注意，注册域名是不一定需要注册 NS 记录。如您使用其他成员提供的 NS 服务器，则无需注册 NS 记录。
+
+- `comment`
+
+  **选填**
+
+  备注信息。会在信息表等场合展示。
+
+- `monitor`
+
+  **选填**。但若有，则至少包含下面任一项
+
+  Monitor 额外配置项
+
+  - `appendix`
+
+    附加信息，会在 Monitor 中展示
+
+  - `custom`
+
+    自定义 ECharts 效果。参考 [此处](https://echarts.apache.org/zh/option.html#series-graph.data)
+
+    JSON 格式
+
+## 设备切换网段
 
 你需要将你设备的网段切换到申请到的网段
 

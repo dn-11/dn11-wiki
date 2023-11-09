@@ -1,6 +1,8 @@
 # BGP组网
 
-原文链接:[https://baimeow.cn/posts/dn11/configurebgp/#配置隧道](https://baimeow.cn/posts/dn11/configurebgp/#%E9%85%8D%E7%BD%AE%E9%9A%A7%E9%81%93)
+[原文链接](https://baimeow.cn/posts/dn11/configurebgp/#%E9%85%8D%E7%BD%AE%E9%9A%A7%E9%81%93)
+
+::: details
 
 DN11配网第二期，接上文 “使用 Bird2 配置 WireGuard + OSPF 实现网络的高可用”，这是一篇用于 DN11 的 BGP 配置教程
 
@@ -9,6 +11,8 @@ DN11配网第二期，接上文 “使用 Bird2 配置 WireGuard + OSPF 实现�
 也有不少人手上有多个内网，不得不打破 DN11 原先一个人使用一个/24网段的约定
 
 近期又在考虑和 VidarNetwork 并网的事情，最终合并完的网络会变得相当庞大，或许是时候转移到BGP上去了
+
+:::
 
 ## 准备
 
@@ -30,7 +34,16 @@ BGP 是用于连接不同 AS 的路由协议，现在定义每一个人选取自
 - 100.64.x.0/24 (比较少见的保留段)
 - 192.168.x.0 (真的很容易冲突，不要用)
 
-此外你还需要避开HDU已经使用了的内网段，具体有哪些段可以在飞书知识库上查找
+此外你还需要避开一些保留的内网段
+
+包括：
+
+| 网段 | 说明 |
+| --- | --- |
+| `172.16.0.0/16` | DN11 常规成员段 |
+| `172.16.255.0/24` | 公共服务段 |
+| `10.0.0.0/24` `10.42.0.0/16`<br>`10.43.0.0/16` `172.16.0.0/24` `172.16.200.0/24`<br>`172.16.254.0/24` `172.26.0.0/16`<br>`172.27.0.0/16` `192.168.1.0/24` | 保留段  |
+| `172.16.128.0/24`<br>`172.16.129.0/24` | 不建议 |
 
 ## 隧道
 
@@ -38,15 +51,32 @@ BGP 是用于连接不同 AS 的路由协议，现在定义每一个人选取自
 
 ### 安装wg-quick-op
 
-我给 openwrt 专门写了一个用来配置 wireguard 的工具，他会帮你处理开机启动，ddns 的问题的同时你可以使用 wg-quick 配置文件的所有配置。主要是基于 wg-quick-go 修改，定制了一些实用功能。
+柏喵给 openwrt 专门写了一个用来配置 WireGuard 的工具，他会帮你处理开机启动，ddns 的问题的同时你可以使用 wg-quick 配置文件的所有配置。主要是基于 wg-quick-go 修改，定制了一些实用功能。
 
-github:[https://github.com/BaiMeow/wg-quick-op](https://github.com/BaiMeow/wg-quick-op)
+Github: [https://github.com/BaiMeow/wg-quick-op](https://github.com/BaiMeow/wg-quick-op)
+
+安装方法：
+
+在 https://github.com/BaiMeow/wg-quick-op/releases 选择适合你架构的包下载
+
+下载完成后 tar -zxvf 进行解压
+
+之后再当前文件夹下输入
+
+```bash
+root@OP:~# ./wg-quick-op install 
+INFO[0000] current binary: /root/wg-quick-op   
+INFO[0000] installed wg-quick-op                        
+INFO[0000] add wg-quick-op to init.d success
+```
+
+会将其安装至 /usr/sbin/目录下，并且添加开机启动
 
 ### 配置隧道
 
-在 `/etc/wireguard`下创建配置文件，一条隧道对应一个配置文件,配置文件命名为 `xxx.conf`。下面给出配置文件示例:
+在 `/etc/wireguard`下创建配置文件（没有这个文件夹的话需要创建），一条隧道对应一个配置文件,配置文件命名为 `xxx.conf`。下面给出配置文件示例:
 
-```
+```txt
 [Interface]
 PrivateKey = <PrivateKey>
 ListenPort = <Port>
@@ -61,13 +91,13 @@ AllowedIPs = 0.0.0.0/0
 
 这里主要参考了 DN42 的配置
 
-* PrivateKey 用 `wg genkey`生成一个
-* ListenPort wireguard监听端口，注意打开防火墙或者配置端口映射
-* PostUp 隧道建立时执行的命令，这个命令添加了一条对等路由，例如 `/sbin/ip addr add dev %i 172.16.4.254/32 peer 172.16.2.254/32`
-* Table = off 请务必使用 off，路由由 bird2 来接管，不需要 wireguard 创建
-* Endpoint 填对面的 IP 和监听的端口
-* PublicKey 填对面的公钥，公钥可用用 `wg pubkey`命令，然后粘贴公钥进去按 ctrl+d 获取
-* AllowedIPs 允许所有 IP 通过 Wireguard 接口
+- PrivateKey **私钥**用 `wg genkey`生成一个
+- ListenPort 为WireGuard监听端口，注意打开防火墙或者配置端口映射
+- PostUp 隧道建立时执行的命令，这个命令添加了一条对等路由，例如 `/sbin/ip addr add dev %i 172.16.4.254/32 peer 172.16.2.254/32`
+- Table = off 请务必使用 off，路由由 bird2 来接管，不需要 WireGuard 创建
+- Endpoint 填对面的 IP 和监听的端口
+- PublicKey 填对面的公钥，公钥可用用 `wg pubkey`命令，然后粘贴**私钥**进去按 ctrl+d 获取
+- AllowedIPs 允许所有 IP 通过 WireGuard 接口
 
 使用 `wg-quick-op up 接口名`来连接这个接口，没有意外的话，现在你能够 ping 通对面的对端IP了
 
@@ -75,13 +105,13 @@ AllowedIPs = 0.0.0.0/0
 
 ### STEP1
 
-首先你需要检查隧道有没有连接上，执行 `wg show 接口名`，看 latest handshake，如果握手时间在两分钟内都是正常的，如果大于两分钟或者没有这个字段，说明 wireguard 连接没有连上。
+首先你需要检查隧道有没有连接上，执行 `wg show 接口名`，看 latest handshake，如果握手时间在两分钟内都是正常的，如果大于两分钟或者没有这个字段，说明 WireGuard 连接没有连上。
 
-这一般是因为端口没开，检查路由器的入站配置，如果是旁路由，还得检查一下端口映射是否正确。这也有可能是DNS记录的地址过期导致的，检查一下 wireguard 的 endpoint 地址是否确实是对面的IP地址。
+这一般是因为端口没开，检查路由器的入站配置，如果是旁路由，还得检查一下端口映射是否正确。这也有可能是DNS记录的地址过期导致的，检查一下 WireGuard 的 endpoint 地址是否确实是对面的IP地址。
 
 ### STEP2
 
-如果连接上了还是没有 ping 通，请检查路由表，有没有到对端的路由，并再次检查你的 wireguard 配置并重启接口
+如果连接上了还是没有 ping 通，请检查路由表，有没有到对端的路由，并再次检查你的 WireGuard 配置并重启接口
 
 ## BGP
 
@@ -91,7 +121,7 @@ AllowedIPs = 0.0.0.0/0
 
 下面给出BGP配置示例，以下示例适用于AS内只有一台路由设备的配置，如果你的AS内有多个路由设备还要做不少额外配置，之后可以另外写一篇文章来谈谈这个问题
 
-```
+```txt
 log syslog all;
 debug protocols all;
 
@@ -167,7 +197,7 @@ protocol bgp hakuya from BGP_peers {
 
 ### 添加更多邻居
 
-```
+```txt
 # protocol bgp protocol名称 from 模板名称
 protocol bgp hakuya from BGP_peers {
     # 对端隧道地址%接口 as ASN
@@ -175,15 +205,23 @@ protocol bgp hakuya from BGP_peers {
 }
 ```
 
+常见故障：%后填写的接口名和wg配置文件启动的接口要完全对应
+
 将这一块内容复制粘贴在文件后面，再修改修改内容即可
 
-### 故障排查
+### bird故障排查
 
 **STEP1 检查 bird 配置文件时候有还未修改为自己的信息的地方**
 
 **STEP2 `birdc c` 应用配置了没有?**
 
-**STEP3 用 `birdc s p`看看具体卡什么状态了，然后问问群友**
+**STEP3 用 `birdc s p`看看具体卡什么状态了**
+
+常见状态：
+
+- `Idle` 未启动（一般是配置填坏了）
+- `Established` 链接已建立
+- `Connect` 隧道没通，bgp未建立
 
 ## End But not Ended
 
@@ -191,4 +229,8 @@ protocol bgp hakuya from BGP_peers {
 
 如果你的AS里有不少子网，这一切还只是折腾 BGP 的开始，在后面还有 BGP Large Community ，BGP confederation ，RR 等内容。
 
-等 DN11 整体迁移到 BGP 后再继续做后部分的教程。
+## Route collector
+
+Route Collector 用于收集所有人的路由最终绘制成一张实时更新的图。
+
+配置详见 [Collector](./collector.md)

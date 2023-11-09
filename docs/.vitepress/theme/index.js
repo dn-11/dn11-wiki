@@ -1,5 +1,6 @@
 import { h, watch } from 'vue'
 import Theme from 'vitepress/theme-without-fonts'
+import Layout from './Layout.vue'
 import './rainbow.css'
 import './style.css'
 
@@ -7,10 +8,7 @@ let homePageStyle
 
 export default {
   ...Theme,
-  Layout: () => {
-    return h(Theme.Layout, null, {
-    })
-  },
+  Layout: Layout,
   enhanceApp({ router }) {
     if (typeof window === 'undefined')
       return
