@@ -121,7 +121,7 @@ AllowedIPs = 0.0.0.0/0
 
 下面给出BGP配置示例，以下示例适用于AS内只有一台路由设备的配置，如果你的AS内有多个路由设备还要做不少额外配置，之后可以另外写一篇文章来谈谈这个问题
 
-```txt
+```bird
 log syslog all;
 debug protocols all;
 
@@ -197,7 +197,7 @@ protocol bgp hakuya from BGP_peers {
 
 ### 添加更多邻居
 
-```txt
+```bird
 # protocol bgp protocol名称 from 模板名称
 protocol bgp hakuya from BGP_peers {
     # 对端隧道地址%接口 as ASN

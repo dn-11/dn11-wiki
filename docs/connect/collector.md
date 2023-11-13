@@ -14,7 +14,7 @@ Route Collector 位于 172.16.255.1
 
 对于 bird 用户，建议添加以下配置到 bird 配置文件中
 
-```txt
+```bird
 protocol bgp collect_self {
         # 修改为你的ASN
         local as 4220084444;
@@ -43,7 +43,7 @@ Input 全拒绝，output 保持和其他 peer 一致即可
 
 Bird 开动态BGP，接受所有人 peer，通过 peer 收发 addpath 的 ASPath，获得尽可能多的ASPath，再利用这些ASPath制图
 
-```txt
+```bird
 ipv4 table collector_table;
 
 protocol mrt {
@@ -70,10 +70,10 @@ protocol bgp collector {
 
 mrt 数据解析,fork并修改自开源项目 go-mrt
 
-https://github.com/BaiMeow/go-mrt
+<https://github.com/BaiMeow/go-mrt>
 
 数据处理与展示写了一个 NetworkMonitor
 
-https://github.com/BaiMeow/NetworkMonitor
+<https://github.com/BaiMeow/NetworkMonitor>
 
 欢迎 Star ⭐

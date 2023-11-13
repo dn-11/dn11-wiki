@@ -1,5 +1,5 @@
 import PanguPlugin from 'markdown-it-pangu'
-
+import { birdConf } from './theme/shiki';
 export default {
   title: 'DN11',
   description: 'An intranet of Building 11',
@@ -9,6 +9,7 @@ export default {
     config: (md) => {
       md.use(PanguPlugin);
     },
+    languages: [birdConf],
   },
   themeConfig: {
     outline: [2, 6],

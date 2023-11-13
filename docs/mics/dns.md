@@ -237,7 +237,7 @@ https://www.iana.org/domains/root/db 这里是世界上完整的顶级域列表�
 
 #### 装包
 
-```
+```bash
 opkg update
 opkg install pdns pdns-backend-sqlite3 pdns-recursor sqlite3-cli
 ```
@@ -246,14 +246,14 @@ opkg install pdns pdns-backend-sqlite3 pdns-recursor sqlite3-cli
 
 创建文件
 
-```
+```bash
 mkdir -p /usr/share/doc/pdns-backend-sqlite/
 touch schema.sqlite3.sql
 ```
 
 然后在schema.sqlite3.sql里写入
 
-```
+```bash
 nano /usr/share/doc/pdns-backend-sqlite/schema.sqlite3.sql
 ```
 
@@ -356,7 +356,8 @@ CREATE UNIQUE INDEX namealgoindex ON tsigkeys(name, algorithm);
 ```
 
 初始化sqlite3
-```
+
+```bash
 mkdir -p /etc/powerdns/
 sqlite3 /etc/powerdns/pdns.sqlite3 < /usr/share/doc/pdns-backend-sqlite/schema.sqlite3.sql
 chmod +r /etc/powerdns
@@ -364,13 +365,13 @@ chmod +r /etc/powerdns
 
 #### 配置pdns
 
-```
+```bash
 nano /etc/powerdns/pdns.conf
 ```
 
 写入
 
-```
+```txt
 launch=gsqlite3
 gsqlite3-database=/etc/powerdns/pdns.sqlite3
 local-address=<!!你的地址!!>:53
@@ -393,7 +394,7 @@ allow-unsigned-notify=yes
 
 在此我给出的解决方案是关闭dnsmasq
 
-```
+```bash
 service dnsmasq stop
 service dnsmasq disable
 ```
@@ -401,7 +402,7 @@ service dnsmasq disable
 然后由于我的dnsmasq会不知道怎么着复活 我写了一个脚本来按死他
 
 
-```
+```bash
 nano /root/stop_dnsmasq_if_running.sh
 ```
 
@@ -414,11 +415,11 @@ if netstat -tlunpa | grep ':53 ' | grep -q 'dnsmasq'; then
 fi
 ```
 
-```
+```bash
 crontab -e
 ```
 
-```
+```bash
 * * * * * /root/stop_dnsmasq_if_running.sh
 ```
 
@@ -426,34 +427,34 @@ crontab -e
 
 #### 启动pdns
 
-```
+```bash
 service pdns restart
 ```
 
 配置自己的子域
-```
+```bash
 pdnsutil create-zone ts.dn11 ns1.ts.dn11
 ```
 
 其中ts换成你想用的域名
 
-```
+```bash
 pdnsutil edit-zone ts.dn11
 ```
 
 edit-zone会唤醒叫editor的编辑器，如果你没有这个叫editor的编辑器 可以写一下环境变量
-```
+```bash
 nano /etc/profile
 ```
 
 添加一行
-```
+```bash
 export EDITOR=/usr/bin/nano
 ```
 
 (op的nano默认安装位置在这里、其他你想配的自由发挥)
 
-```
+```bash
 source /etc/profile
 ```
 
@@ -461,7 +462,7 @@ source /etc/profile
 
 打开edit-zone后 写入
 
-```
+```txt
 ; Warning - every name in this file is ABSOLUTE!
 $ORIGIN .
 ts.dn11 3600    IN      SOA     ns1.ts.dn11 hostmaster.ts.dn11 2023093018 60 30 604800 60
@@ -476,13 +477,13 @@ ts.dn11 60      IN      A       172.16.3.1
 
 #### 验证
 
-```
+```bash
 dig a ts.dn11 @172.16.3.53 -p 53
 ```
 
 如果返回类似如下内容则成功
 
-```
+```bash
 root@OP:~# dig a ts.dn11 @172.16.3.53 -p 53
 
 ; <<>> DiG 9.18.16 <<>> a ts.dn11 @172.16.3.53 -p 53
@@ -511,7 +512,7 @@ ts.dn11.                60      IN      A       172.16.3.1
 内网用户需要访问 http://172.16.7.102:8083/login （账号密码dn11）来配置自己的域名权威的ns指向
 
 点击dn11域、点击 add record 、添加两条记录
-```
+```txt
 ns1.ts    A      172.16.3.53
 ts        NS     ns1.ts.dn11.
 ```
@@ -522,37 +523,37 @@ ts        NS     ns1.ts.dn11.
 
 然后回到本地 输入
 
-```
+```bash
 pdnsutil create-zone dn11
 ```
 
 创建dn11域
 
-```
+```bash
 pdnsutil edit-zone dn11
 ```
 
 修改里面的soa值为
-````
+```txt
 dn11    300     IN      SOA     a.root.dn11 hostmaster.dn11 1 60 60 604800 60
-````
+```
 
 解释：流水号填小 便于拉取上游的同步
 
 然后写数据库启用主从同步
 
-```
+```bash
 sqlite3 /etc/powerdns/pdns.sqlite3
 ```
 
 进入sqlite命令行
 
 先启用看头
-```
+```sql
 sqlite> .header yes
 ```
 
-```
+```sql
 sqlite> select * from domains;
 id|name|master|last_check|type|notified_serial|account|options|catalog
 1|ts.dn11|||NATIVE||||
@@ -561,7 +562,7 @@ id|name|master|last_check|type|notified_serial|account|options|catalog
 
 里面大概也许是这样、然后写数据库同步上游
 
-```
+```sql
 UPDATE domains
 SET master = '172.16.7.53', type = 'SLAVE'
 WHERE name = 'dn11';
@@ -570,7 +571,7 @@ WHERE name = 'dn11';
 写完按 ctrl + D 退出sqlite命令行
 
 然后使用
-```
+```bash
 pdns_control retrieve dn11
 ```
 
@@ -578,13 +579,13 @@ pdns_control retrieve dn11
 
 最后看下自己的记录有没有被同步
 
-```
+```bash
 root@OP:~# pdnsutil list-zone dn11
 ```
 
 检查一下
 
-```
+```bash
 root@OP:~# dig ns ts.dn11 @172.16.3.53 -p 53
 
 ; <<>> DiG 9.18.16 <<>> ns ts.dn11 @172.16.3.53 -p 53
@@ -610,13 +611,13 @@ ts.dn11.                60      IN      NS      172.16.3.53.
 
 #### 配置pdns_recursor
 
-```
+```bash
 nano /etc/powerdns/recursor.conf
 ```
 
 写入
 
-```
+```txt
 # 接受哪些IP的查询请求，0.0.0.0/0表示全部
 allow-from=0.0.0.0/0
 
@@ -636,11 +637,8 @@ forward-zones-recurse=dn11=172.16.3.53,.=223.5.5.5
 本地监听的ip地址这里使用anycast、同样的你需要在你的网卡里加一个ip为172.16.255.53（监听5300的原因是、如果路由路径上有人开了dnsmasq、那么这个53请求会被劫持）
 
 并且宣告
-```
-root@OP:~# cat /etc/bird.conf
 
-.........
-
+```bird
 # 宣告 172.16.3.0/24 段
 protocol static {
     ipv4 {
@@ -656,9 +654,9 @@ protocol static {
     route 172.16.3.0/24 reject;
     route 172.16.255.53/32 reject;
 }
+```
 
-.........
-
+```bash
 root@OP:~# service bird restart
 ```
 
@@ -670,13 +668,13 @@ forward-zones-recurse=dn11=172.16.3.53,.=223.5.5.5
 
 然后重启
 
-```
+```bash
 service pdns-recursor restart
 ```
 
 最后测试一下、请求一下网里存在的域名
 
-```
+```bash
 root@OP:~# dig op.iraze.dn11 @172.16.255.53 -p 53
 
 ; <<>> DiG 9.18.16 <<>> op.iraze.dn11 @172.16.255.53 -p 53
@@ -703,7 +701,7 @@ op.iraze.dn11.          60      IN      A       172.16.2.2
 
 ### 2.docker拉镜像 装pdns-admin web界面管理
 
-```
+```yaml
 [root@gs-fedora Pdns]# cat docker-compose.yml 
 version: "3"
 
@@ -770,7 +768,7 @@ services:
 
 
 
-```
+```bash
 [root@gs-fedora Pdns]# cat up.sh 
 service system-resolve stop
 ip addr add 172.16.7.53 dev eno1
@@ -788,7 +786,7 @@ PDNS_api_key=0F34664B2C9CA2E1B84C5A6B4605C968
 
 装包
 
-```
+```bash
 opkg update
 opkg install mosdns
 ```
@@ -797,11 +795,11 @@ opkg install mosdns
 
 改配置
 
-```
+```bash
 nano /etc/mosdns/config.yaml
 ```
 
-```
+```yaml
 log:
   level: info
   file: "/tmp/mosdns.log"
@@ -840,7 +838,6 @@ plugins:
 
 同样的 启动需要你br-lan网卡里加一个 172.16.3.13这个ip地址
 
-```
+```bash
 service mosdns restart
 ```
-

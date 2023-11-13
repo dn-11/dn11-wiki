@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "shiki": "^0.14.5",
     "vitepress": "1.0.0-rc.25",
     "vue": "^3.3.8"
   },

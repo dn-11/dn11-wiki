@@ -21,7 +21,7 @@ IBGP 需要配置 fullmesh，这是由他的设计决定的，IBGP 只会把自�
 
 由于这次的配置文件比较长，我们会把他切分到各个文件中，所以先介绍一下入口文件 `bird.conf`的配置
 
-```
+```bird
 log syslog all;
 debug protocols all;
 
@@ -76,7 +76,7 @@ protocol pipe pipe_bgp_table {
 
 理论上讲保证自治域内部的通畅是一个自治域的基本要求，一般需要先把自己配通了再去想着和其他人 peer。所以确保自己内网的通畅是第一步。我们下面使用 OSPF 来确保 AS 内部的连通性
 
-```
+```bird
 protocol ospf v2 selfnet {
         ipv4 {
                 table OSPF_table;
@@ -101,13 +101,13 @@ OSPF 的教程前面有一篇文章讲解过了。这里我们在回环口 lo �
 
 对于这个 bcast，如果你想把这台机器的内网广播到 OSPF 的话，把 lo 改成 br-lan 这种 lan 的接口名就可以了，此时你的路由设备在 OSPF 的 IP 就是你 br-lan 接口上的 IP；如果你是云服务器，下面压根没有子网，这种时候建议手动在 lo 接口配置一个 ip 并通过广播 lo 接口的 ip 的方式把你的设备广播在你的OSPF里。
 
-```
+```bash
 ip addr add 172.16.4.6 dev lo
 ```
 
 为了让这个添加到 lo 的 ip 永久生效，你需要看看你的系统下的网络是怎么管理的，下面展示一下 netplan 的配置。
 
-```
+```yaml
 # cat /etc/netplan/70-lo.yaml
 network:
   ethernets:
@@ -122,7 +122,7 @@ network:
 
 ospf 的 cost 随你喜欢，我个人一般综合判断带宽和延时决定大概给多少 cost。下面给出一个标准 WireGuard 隧道配置样例。
 
-```
+```txt
 [Interface]
 ListenPort = <listenPort>
 PrivateKey = <privateKey>
@@ -145,7 +145,7 @@ Endpoint = <endpoint>
 
 一个 AS 所拥有的网段基本是固定的，只需要宣告固定的网段就好了，这里推荐使用静态宣告。当然你也可以把 OSPF 重分发出来，但是重分发很容易重分发出一些内部的隧道段出来，也会让漏油的风险++，个人不推荐这个配法。不过他也有一个好处，就是即使你AS内部炸了，你依然有可能可以绕路其他的 AS 访问到裂开的另一块。但这不清真，一般来说 **保证自己的 AS 内部的连通性是 AS 自身的义务** 。
 
-```
+```bird
 protocol static {
     ipv4 {
         table BGP_table;
@@ -183,7 +183,7 @@ protocol bgp hakuya_tokyo_aws from BGP_peers {
 
 上面配好之后如果你先注释掉 IBGP 的配置文件的 include，你会发现你和别人起 EBGP 的那台设备一切正常，而另一台机器只有 OSPF 的路由，缺少到其他 AS 的路由，这便是 IBGP 想要解决的问题。我们通过 IBGP 来同步 AS 不同边界网关获取到的外部 EBGP 路由。下面先给出配置样例：
 
-```
+```bird
 template bgp ibgp_peers {
     # change it
     local as 4220084444;
