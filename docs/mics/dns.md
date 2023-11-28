@@ -158,9 +158,7 @@ ubuntu@ubuntu_dn11:~$ dig ns . @8.8.8.8
 
 顶级域名服务器这个服务器是搜索特定 IP 地址的下一步，其上托管了主机名的最后一部分（例如，在 dn11.top 中，TLD 服务器为 “top”）。
 
-https://www.iana.org/domains/root/db 这里是世界上完整的顶级域列表。
-
-
+<https://www.iana.org/domains/root/db> 这里是世界上完整的顶级域列表。
 
 4. 权威性域名服务器
 
@@ -172,7 +170,7 @@ https://www.iana.org/domains/root/db 这里是世界上完整的顶级域列表�
 
 ### 递归工作流程
 
-![](https://picxyxsw.oss-cn-hangzhou.aliyuncs.com/20231006233612.png)
+![递归工作流程](https://picxyxsw.oss-cn-hangzhou.aliyuncs.com/20231006233612.png)
 
 我这里画了一张图：其中红色服务器为DNS递归服务器，PC上的DNS客户端只与DNS递归服务器通讯，由递归服务器完成后续查询内容。蓝色云为想要访问的网站的ip地址所在的服务器。
 
@@ -202,7 +200,7 @@ https://www.iana.org/domains/root/db 这里是世界上完整的顶级域列表�
 
 ### 迭代工作流程
 
-![](https://picxyxsw.oss-cn-hangzhou.aliyuncs.com/20231015181102.png)
+![迭代工作流程](https://picxyxsw.oss-cn-hangzhou.aliyuncs.com/20231015181102.png)
 
 我这里画了一张图：其中红色服务器为DNS递归服务器，PC上的DNS客户端只与DNS递归服务器通讯，由递归服务器和权威服务器的迭代查询完成后续查询内容。蓝色云为想要访问的网站的ip地址所在的服务器。
 
@@ -230,7 +228,6 @@ https://www.iana.org/domains/root/db 这里是世界上完整的顶级域列表�
 
 ⑩：云服务器返回网页数据给PC浏览器、实现页面的访问
 
-
 ## 配置pdns
 
 ### 1.openwrt直接启动
@@ -256,8 +253,6 @@ touch schema.sqlite3.sql
 ```bash
 nano /usr/share/doc/pdns-backend-sqlite/schema.sqlite3.sql
 ```
-
-
 
 ```sql
 PRAGMA foreign_keys = 1;
@@ -363,7 +358,7 @@ sqlite3 /etc/powerdns/pdns.sqlite3 < /usr/share/doc/pdns-backend-sqlite/schema.s
 chmod +r /etc/powerdns
 ```
 
-#### 配置pdns
+#### 配置powerdns
 
 ```bash
 nano /etc/powerdns/pdns.conf
@@ -388,8 +383,6 @@ allow-unsigned-notify=yes
 
 对于op来说 可以在web管理界面 选择网络 新建一个接口 区域lan 设备br-lan 地址为`172.16.3.53`
 
-
-
 对于监听53端口、你的本地dnsmasq可能会劫持这个端口
 
 在此我给出的解决方案是关闭dnsmasq
@@ -400,7 +393,6 @@ service dnsmasq disable
 ```
 
 然后由于我的dnsmasq会不知道怎么着复活 我写了一个脚本来按死他
-
 
 ```bash
 nano /root/stop_dnsmasq_if_running.sh
@@ -432,6 +424,7 @@ service pdns restart
 ```
 
 配置自己的子域
+
 ```bash
 pdnsutil create-zone ts.dn11 ns1.ts.dn11
 ```
@@ -443,11 +436,13 @@ pdnsutil edit-zone ts.dn11
 ```
 
 edit-zone会唤醒叫editor的编辑器，如果你没有这个叫editor的编辑器 可以写一下环境变量
+
 ```bash
 nano /etc/profile
 ```
 
 添加一行
+
 ```bash
 export EDITOR=/usr/bin/nano
 ```
@@ -457,8 +452,6 @@ export EDITOR=/usr/bin/nano
 ```bash
 source /etc/profile
 ```
-
-
 
 打开edit-zone后 写入
 
@@ -509,9 +502,10 @@ ts.dn11.                60      IN      A       172.16.3.1
 
 #### 配置TLD域、拉取同步
 
-内网用户需要访问 http://172.16.7.102:8083/login （账号密码dn11）来配置自己的域名权威的ns指向
+内网用户需要访问 <http://172.16.7.102:8083/login> （账号密码dn11）来配置自己的域名权威的ns指向
 
 点击dn11域、点击 add record 、添加两条记录
+
 ```txt
 ns1.ts    A      172.16.3.53
 ts        NS     ns1.ts.dn11.
@@ -534,12 +528,14 @@ pdnsutil edit-zone dn11
 ```
 
 修改里面的soa值为
+
 ```txt
 dn11    300     IN      SOA     a.root.dn11 hostmaster.dn11 1 60 60 604800 60
 ```
 
 解释：流水号填小 便于拉取上游的同步
 
+::: details 过时内容
 然后写数据库启用主从同步
 
 ```bash
@@ -549,6 +545,7 @@ sqlite3 /etc/powerdns/pdns.sqlite3
 进入sqlite命令行
 
 先启用看头
+
 ```sql
 sqlite> .header yes
 ```
@@ -571,6 +568,7 @@ WHERE name = 'dn11';
 写完按 ctrl + D 退出sqlite命令行
 
 然后使用
+
 ```bash
 pdns_control retrieve dn11
 ```
@@ -581,6 +579,58 @@ pdns_control retrieve dn11
 
 ```bash
 root@OP:~# pdnsutil list-zone dn11
+```
+
+:::
+
+配置主从同步
+
+目前所有的dns注册都在 [Registry](https://github.com/hdu-dn11/registry) 里面，生成的 zone 文件在 [metadata里的zone](https://raw.githubusercontent.com/hdu-dn11/metadata/main/dn11.zone)
+
+我们可以写crontab脚本来同步这个文件里的内容
+
+```bash
+nano /root/sync_dn11_zone.sh
+```
+
+```bash
+#!/bin/bash
+
+url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/hdu-dn11/metadata/main/dn11.zone"  # 这里使用的代理网站是 mirror.ghproxy.com 这个网站可能会坏掉，请自己找一个代理网站或者直接使用 https://raw.githubusercontent.com/hdu-dn11/metadata/main/dn11.zone
+output_file="dn11_output.txt"        # 将文件路径替换为你的输出文件路径
+dn11_zone_file="/etc/powerdns/dn11.zone"      # 将文件路径替换为你的dn11.zone文件路径
+pdnsutil_command="pdnsutil load-zone dn11 $dn11_zone_file"
+# 使用curl获取页面内容并检查HTTP状态码
+response=$(curl -s -w "%{http_code}" $url -o $output_file)
+
+# 检查HTTP状态码是否为200（成功）
+if [ "$response" -eq 200 ]; then
+    # 比较新获取的内容和dn11.zone的内容
+    if ! diff -q $output_file $dn11_zone_file > /dev/null; then
+        # 如果有差异，覆盖dn11.zone文件
+        cp $output_file $dn11_zone_file
+        #将文件载入
+        $pdnsutil_command
+        # 加载zone文件
+    else
+        echo "页面内容没有变化。"
+    fi
+else
+    # 处理HTTP错误
+    echo "无法访问页面。HTTP状态码: $response"
+fi
+```
+
+```bash
+chmod +x /root/sync_dn11_zone.sh
+
+crontab -e
+```
+
+在crontab里填入（时间和频率自定、如下是每天03:05更新一次、crontab写法见 [crontab计算器](https://tool.lu/crontab/)）
+
+```bash
+5 3 * * * /root/sync_dn11_zone.sh
 ```
 
 检查一下
@@ -697,8 +747,6 @@ op.iraze.dn11.          60      IN      A       172.16.2.2
 ;; MSG SIZE  rcvd: 58
 ```
 
-
-
 ### 2.docker拉镜像 装pdns-admin web界面管理
 
 ```yaml
@@ -766,8 +814,6 @@ services:
 
 ```
 
-
-
 ```bash
 [root@gs-fedora Pdns]# cat up.sh 
 service system-resolve stop
@@ -779,8 +825,6 @@ ip addr add 172.16.7.53 dev eno1
 PDNS_api_key=0F34664B2C9CA2E1B84C5A6B4605C968
 
 在powerdns admin settings pdns中填写这个key 填好后 在上层的PowerDNS server configuration & statistics里能看到一系列pdns的字段
-
-
 
 ## 配置dns分流 MosDNS
 
