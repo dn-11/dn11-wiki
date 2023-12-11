@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs --port 8000",
     "docs:build": "vitepress build docs",
@@ -12,11 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "shiki": "^0.14.5",
-    "vitepress": "1.0.0-rc.25",
-    "vue": "^3.3.8"
+    "vitepress": "1.0.0-rc.31",
+    "vue": "^3.3.11"
   },
   "devDependencies": {
-    "markdown-it-pangu": "^1.0.2"
+    "markdown-it-pangu": "^1.0.2",
+    "shikiji": "^0.8.0"
   }
 }
