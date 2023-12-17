@@ -13,11 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "vitepress": "1.0.0-rc.31",
-    "vue": "^3.3.11"
+    "vitepress": "1.0.0-rc.32",
+    "vue": "^3.3.12"
   },
   "devDependencies": {
     "markdown-it-pangu": "^1.0.2",
-    "shikiji": "^0.8.0"
+    "shikiji": "^0.9.9"
   }
 }
