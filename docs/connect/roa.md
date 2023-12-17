@@ -59,7 +59,7 @@ nano /root/update_roa.sh
 
 ```bash
 #!/bin/sh
-FILE_URL="https://gh.dn11.top/https://raw.githubusercontent.com/hdu-dn11/metadata/main/dn11_roa_bird2.conf"
+FILE_URL="https://metadata.dn11.baimeow.cn/dn11_roa_bird2.conf"
 DEST_DIR="/etc/bird"
 DEST_FILE="${DEST_DIR}/dn11_roa_bird2.conf"
 curl -sS -o "${DEST_FILE}" "${FILE_URL}" || {
