@@ -37,7 +37,7 @@ template bgp BGP_peers {
     ipv4 {
         table BGP_table;
         import filter{
-            if roa_check(rpki_dn11_v4, net, bgp_path.last) !~ [ROA_VALID, ROA_UNKNOWN] then {
+            if roa_check(dn11_roa4, net, bgp_path.last) !~ [ROA_VALID, ROA_UNKNOWN] then {
                 print "[DN11] ROA check failed for ", net, " ASN ", bgp_path.last;
                 reject;
             }
