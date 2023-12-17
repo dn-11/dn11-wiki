@@ -596,7 +596,7 @@ nano /root/sync_dn11_zone.sh
 ```bash
 #!/bin/bash
 
-url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/hdu-dn11/metadata/main/dn11.zone"  # 这里使用的代理网站是 mirror.ghproxy.com 这个网站可能会坏掉，请自己找一个代理网站或者直接使用 https://raw.githubusercontent.com/hdu-dn11/metadata/main/dn11.zone
+url="https://gh.dn11.top/https://raw.githubusercontent.com/hdu-dn11/metadata/main/dn11.zone"  # 这里使用的代理网站是 gh.dn11.top 自己搭的不确定什么时候会坏，你可以自己搭一个或者去找个别的 https://raw.githubusercontent.com/hdu-dn11/metadata/main/dn11.zone
 output_file="dn11_output.txt"        # 将文件路径替换为你的输出文件路径
 dn11_zone_file="/etc/powerdns/dn11.zone"      # 将文件路径替换为你的dn11.zone文件路径
 pdnsutil_command="pdnsutil load-zone dn11 $dn11_zone_file"

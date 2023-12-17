@@ -16,21 +16,22 @@ Route Collector 位于 172.16.255.1
 
 ```bird
 protocol bgp collect_self {
-        # 修改为你的ASN
-        local as 4220084444;
-        neighbor 172.16.255.1 as 4211110101;
-        multihop;
-        ipv4 {
-                add paths tx;
-                # 修改为你的 BGP Table
-                table BGP_table;
-                import none;
-                # 如果你使用 protocol static 宣告网段无需修改
-                # 如果你使用重分发，自行修改过滤规则
-                export filter {
-                        if source ~ [RTS_BGP,RTS_STATIC] then accept;
-                };
+    # 修改为你的ASN
+    local as 4220084444;
+    neighbor 172.16.255.1 as 4211110101;
+    multihop;
+    ipv4 {
+        add paths tx;
+        # 修改为你的 BGP Table
+        table BGP_table;
+        import none;
+        # 如果你使用 protocol static 宣告网段无需修改
+        # 如果你使用重分发，自行修改过滤规则
+        export filter {
+            if source ~ [RTS_BGP,RTS_STATIC] then accept;
+            reject;
         };
+    };
 }
 ```
 
@@ -47,24 +48,24 @@ Bird 开动态BGP，接受所有人 peer，通过 peer 收发 addpath 的 ASPath
 ipv4 table collector_table;
 
 protocol mrt {
-        table collector_table;
-        filename "/var/log/bird/%m-%d-%Y-%H-%M.mrt";
-        period 60;
-        always add path;
+    table collector_table;
+    filename "/var/log/bird/%m-%d-%Y-%H-%M.mrt";
+    period 60;
+    always add path;
 }
 
 protocol bgp collector {
-        source address 172.16.255.1;
-        local as 4211110101;
-        neighbor range 0.0.0.0/0 external;
-        multihop;
-        dynamic name "collect";
-        ipv4 {
-                add paths rx;
-                table collector_table;
-                import all;
-                export none;
-        };
+    source address 172.16.255.1;
+    local as 4211110101;
+    neighbor range 0.0.0.0/0 external;
+    multihop;
+    dynamic name "collect";
+    ipv4 {
+        add paths rx;
+        table collector_table;
+        import all;
+        export none;
+    };
 }
 ```
 

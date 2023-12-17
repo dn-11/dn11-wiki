@@ -46,6 +46,7 @@ export default {
         { text: 'BGP', link: '/connect/bgp' },
         { text: 'IBGP', link: '/connect/ibgp' },
         { text: 'Route Collector', link: '/connect/collector' },
+        { text: 'ROA', link: '/connect/roa' },
       ]
     },
     {
