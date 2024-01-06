@@ -892,3 +892,38 @@ plugins:
 ```bash
 service mosdns restart
 ```
+
+## 定位是谁有问题
+
+::: warning 😡
+我去怎么解析不出来 谁TM出的问题
+:::
+
+```bash
+dig id.server CH TXT @172.16.255.53
+```
+
+例如返回的是这样的
+
+```txt{13}
+; <<>> DiG 9.18.11 <<>> id.server CH TXT @172.16.255.53
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 18873
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;id.server.                     CH      TXT
+
+;; ANSWER SECTION:
+id.server.              85145   CH      TXT     "typescript"
+
+;; Query time: 0 msec
+;; SERVER: 172.16.255.53#53(172.16.255.53) (UDP)
+;; WHEN: Sat Jan 06 23:54:18 CST 2024
+;; MSG SIZE  rcvd: 61
+```
+
+说明你递归连到了typescript的anycast服务，解析不出的话你可以找他修网了
