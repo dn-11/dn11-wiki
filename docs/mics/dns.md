@@ -368,13 +368,12 @@ nano /etc/powerdns/pdns.conf
 
 ```txt
 launch=gsqlite3
+
 gsqlite3-database=/etc/powerdns/pdns.sqlite3
+
 local-address=<!!你的地址!!>:53
-allow-axfr-ips=0.0.0.0/0
-slave=yes
-allow-notify-from=0.0.0.0/0
-allow-dnsupdate-from=0.0.0.0/0
-allow-unsigned-notify=yes
+
+server-id=<你的id（用于标识你的pdns）>
 ```
 
 解释：由于我们正在配置pdns权威服务器，地址可以选一个你自己子网你喜欢的、比如说我在`172.16.3.53`
@@ -677,9 +676,17 @@ local-address=172.16.255.53:53 172.16.255.53:5300
 # 关闭dnssec功能，4.5版本后默认开启
 dnssec=off
 
+# 覆写默认屏蔽的内网请求
 dont-query=
 
+# 转发到权威
 forward-zones-recurse=dn11=172.16.3.53,.=223.5.5.5
+
+# 启动文件保存目录
+socket-dir=/etc/powerdns/socket
+
+# 标识这台anycast的名字
+server-id=<你的名字>
 ```
 
 解释：
