@@ -86,7 +86,7 @@ Table = off
 [Peer]
 Endpoint = <EndPoint IP>
 PublicKey = <Public Key>
-AllowedIPs = 0.0.0.0/0
+AllowedIPs = 10.0.0.0/8, 100.64.0.0/10, 172.16.0.0/12, 192.168.0.0/16
 ```
 
 这里主要参考了 DN42 的配置
@@ -97,7 +97,7 @@ AllowedIPs = 0.0.0.0/0
 - Table = off 请务必使用 off，路由由 bird2 来接管，不需要 WireGuard 创建
 - Endpoint 填对面的 IP 和监听的端口
 - PublicKey 填对面的公钥，公钥可用用 `wg pubkey`命令，然后粘贴**私钥**进去按 ctrl+d 获取
-- AllowedIPs 允许所有 IP 通过 WireGuard 接口
+- AllowedIPs 允许所有**内网** IP 通过 WireGuard 接口
 
 使用 `wg-quick-op up 接口名`来连接这个接口，没有意外的话，现在你能够 ping 通对面的对端IP了
 

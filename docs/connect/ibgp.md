@@ -122,6 +122,8 @@ network:
 
 ospf 的 cost 随你喜欢，我个人一般综合判断带宽和延时决定大概给多少 cost。下面给出一个标准 WireGuard 隧道配置样例。
 
+**yourIP 最好另起隧道 ip（即不要和 lo 上面的 ip 冲突）**
+
 ```txt
 [Interface]
 ListenPort = <listenPort>
@@ -131,7 +133,7 @@ Table = off
 
 [Peer]
 PublicKey = <publicKey>
-AllowedIPs = 0.0.0.0/0,::/0
+AllowedIPs = 10.0.0.0/8, 100.64.0.0/10, 172.16.0.0/12, 192.168.0.0/16
 Endpoint = <endpoint>
 ```
 
