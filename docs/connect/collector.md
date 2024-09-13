@@ -1,6 +1,6 @@
 # Route Collector
 
-[Status](https://status.dn11.top)
+[Status 图查看](https://status.dn11.top)
 
 Route Collector 用于收集所有人的路由最终绘制成一张实时更新的图。
 

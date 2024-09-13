@@ -18,15 +18,15 @@
 目前DN11仅支持通过WireGuard接入，后续会开放其他接入方式
 :::
 
-对于 openwrt 需要安装 `luci-app-wireguard` 包，使用web面板安装之后会连带一系列依赖。
+::: tip
+x86 设备推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt) 23.05以上版本
+
+其他架构可以考虑自行编译或者去[firmware-selector immortalwrt](https://firmware-selector.immortalwrt.org/)选择合适的固件
+:::
+
+对于 openwrt 需要安装 `luci-proto-wireguard` `kmod-wireguard` 包，使用web面板安装之后会连带一系列依赖。
 
 之后请检查 `状态-WireGuard状态`是否存在，若不存在请考虑更换固件。具体更换什么固件可以向群友求助获得编译好的固件也可以自行编译。
-
-::: details
-x86 推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt)
-
-其他架构可以考虑自行编译。
-:::
 
 ## 申请网段
 
@@ -34,17 +34,19 @@ x86 推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt)
 建议大致浏览完 [bgp](/connect/bgp) 章节后再进行申请，能避免一些问题
 :::
 
-申请网段需要向 [dn11-registry](https://github.com/hdu-dn11/registry) 提交Pull Request
+申请网段需要向 [dn11-registry](https://github.com/dn-11/registry) 提交Pull Request
 
 ### 成员注册
 
-您仅需要在 `as` 目录中创建一个 YAML 文件，文件名为 `<your-asn>.yml`，然后以 [`example.yml`](https://github.com/hdu-dn11/registry/blob/main/as/example.yml) 为模板填写。填写完成后提交一个 PR，根据 Checker 回复修改您的配置，然后等待管理员合并即可。
+您仅需要在 `as` 目录中创建一个 YAML 文件，文件名为 `<your-asn>.yml`，然后以 [`example.yml`](https://github.com/dn-11/registry/blob/main/as/example.yml) 为模板填写。填写完成后提交一个 PR，根据 Checker 回复修改您的配置，然后等待管理员合并即可。
+
+如下为字段说明
 
 - `ASN`
 
   **必填**（文件名）
 
-  格式为 `421111xxxx` 或 `422008xxxx` (仅 Vidar 成员)
+  格式为 `421111xxxx` （dn11成员）或 `422008xxxx` （仅 Vidar 成员）
 
   后四位任选，无冲突即可。
 
@@ -68,9 +70,9 @@ x86 推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt)
 
   您所使用的 IP 段
 
-  DN11 默认从 `172.16.0.0/16` 段中使用 `/24` 作为成员段。请优先选择该段内的最小一个未使用的 `/24` 地址。
+  DN11 默认从 `172.16.0.0/16` 段中使用某个 `/24` 作为成员段。请优先选择该段内的最小一个未使用的 `/24` 地址（[信息表](https://github.com/dn-11/metadata/blob/main/README.md)的README界面会**提示下一个建议使用的网段**）。
 
-  您可在 [信息表](https://github.com/hdu-dn11/metadata/blob/main/README.md) 中查看已使用的 IP 段。
+  您可在 [信息表](https://github.com/dn-11/metadata/blob/main/README.md) 中查看已使用的 IP 段。
 
   如您确需使用其他 IP，请在群中说明情况。
 
@@ -81,6 +83,8 @@ x86 推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt)
   可在此处注册您的域名，以便我们为您生成 Zone 文件。
 
   如注册域名，则每个域名至少提供一个 NS 记录的 IP 地址。
+
+  此处也可用于注册 rDNS 域名，格式与普通域名相同。请注意，目前仅子网掩码为 `/8`、`/16`、`/24` 的 IP 地址可注册 rDNS 域名。
 
 - `ns`
 
@@ -119,9 +123,7 @@ x86 推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt)
 你需要将你设备的网段切换到申请到的网段
 
 ::: danger
-如果你是新手，更建议全部推倒重新配置
-
-如果确定要切换，请务必在大佬指导下操作，不然容易**寄**
+如果你是新手，更建议**全部推倒**重新配置（包括重置你的内网网段到申请的网段）
 :::
 
 由于不同的人有不同网络环境，比较复杂，这里仅简单描述
@@ -142,14 +144,14 @@ x86 推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt)
 
 #### 网段划分建议
 
-- 静态IP池：172.16.X.0/26  `即172.16.X.2~172.16.X.63`
-- DHCP池：172.16.X.64/26   `即172.16.X.64~172.16.X.127`
-- 外部IP池：172.16.X.128/26  `即172.16.X.128~172.16.X.191`
-- 备用：172.16.X.192/26     `即172.16.X.192~172.16.X.253`
+- 静态IP池：172.16.X.0/26  `即 172.16.X.2~172.16.X.63`
+- DHCP池：172.16.X.64/26   `即 172.16.X.64~172.16.X.127`
+- 外部IP池：172.16.X.128/26  `即 172.16.X.128~172.16.X.191`
+- 备用：172.16.X.192/26     `即 172.16.X.192~172.16.X.253`
 
 当然你也可以用自己喜欢的方式划分网段，毕竟这是你自己的网络
 
-分配IP时，不要占用.255和.0，.254也不要占用（可能会成为你后续配置的wg隧道地址）
+分配IP时，不要占用`.255`和`.0`，`.254`也不要占用（根据本教程会成为你后续配置的wg隧道地址）
 
 #### 配置建议
 
@@ -171,56 +173,6 @@ x86 推荐使用 [immortalwrt](https://github.com/immortalwrt/immortalwrt)
 
 ::: danger
 
-下面的内容对于现在的dn11已经过期，但是可以作为单点接入自己的参考。
-
-更多内容推荐移步[BGP组网](/connect/bgp)章节
+下面的内容移步[BGP组网](/connect/bgp)章节
 
 :::
-
-### 创建并配置接口
-
-在 `网络-接口-添加新接口...`里创建新接口
-
-- 名称（）：`dn11`
-- 新接口协议：`WireGuard VPN`
-
-完成创建后，点击 `修改`，修改你新建的接口，在基本设置中填入
-
-- 私钥：填入你在上一步生成的私钥
-- 监听端口：随意，不建议用过低的端口和特殊端口
-- IP地址：该设备地址，一般填入 `172.16.X.1/24`
-
-然后在防火墙设置（在接口的基本设置右边）中选择不指定或新建，右边填入DN11，这一步将新建一个名为DN11的新防火墙区域
-
-### 配置防火墙区域
-
-在 `网络-防火墙-区域` ，点击DN11的修改，对DN11区域进行修改
-
-- 入站数据：接受
-- 出站数据：接受
-- 转发：接受
-- 允许转发到：lan，wan
-- 允许从源区域转发：lan，wan
-
-> 如果你在配置旁路由，没有wan
-
-### 打开端口
-
-点击 `防火墙-通信规则-打开路由器接口-添加`
-
-- 名称（建议）：dn11
-- 传输协议：udp
-- 源区域：任意区域
-- 源MAC地址：所有
-- 源地址：所有
-- 源端口：所有
-- 目标区域：设备（输入）
-- 目标地址：所有
-- 目标端口：填写你配置接口使用的监听端口
-- 动作：接受
-
-这一步打开端口给所有地址连接
-
-### 测试连接
-
-现在你可以试着用你的设备来连接openwrt上的WireGuard了

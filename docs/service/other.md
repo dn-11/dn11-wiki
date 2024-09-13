@@ -1,5 +1,9 @@
 # dn11服务
 
+::: warning
+服务变的太快 此处可能是过时内容 仅做展示
+:::
+
 ::: tip
 如何填写一个服务
 
@@ -14,23 +18,15 @@ Line end: 服务归属
 
 Emby of ts
 
-172.16.3.182:8096
+172.16.3.5:8096
 
 - <https://emby.ts.dn11>
 - [auth] dn11/dn11
 - typescript
 
-komga漫画库
+Alist
 
-172.16.3.182:8088
-
-- <https://komga.ts.dn11>
-- [auth] dn11@dn11.top/dn11
-- typescript
-
-Alist (里面是galgame)
-
-172.16.3.182:5244
+172.16.3.5:5244
 
 - <https://alist.ts.dn11>
 - [auth] dn11/dn11
@@ -38,25 +34,17 @@ Alist (里面是galgame)
 
 openspeedtest（可以对ts测速）
 
-172.16.3.182:3123
+172.16.3.5:3123
 
 - <https://speedtest.ts.dn11>
 - typescript
 
 mc
-172.16.3.182
+172.16.3.5
 :61111
 
 - <https://mc.ts.dn11>
 - 版本1.20.2纯净
-- typescript
-
-im
-
-172.16.3.182:8008
-
-- <https://im.ts.dn11>
-- 可以用element（电脑）、fluffychat（手机）等软件连接
 - typescript
 
 Smb of bs

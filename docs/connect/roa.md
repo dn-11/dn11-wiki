@@ -22,7 +22,7 @@ UNKNOWN 未知：路由公告没有 ROA
 
 ## 配置 ROA
 
-在/etc/bird/bgp.conf中添加以下内容（同时删除原来的template bgp BGP_peers）：
+在`/etc/bird/bgp.conf`中添加以下内容（同时删除原来的`template bgp BGP_peers`）：
 
 ```bird
 roa4 table dn11_roa4;
