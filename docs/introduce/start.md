@@ -11,3 +11,9 @@ DN11全称为 “11号去中心化网络”（Decentralized Network 11），~~�
 <!-- 接入后可以[加群](https://jq.qq.com/?_wv=1027&k=wlfajEoS)来吹水 -->
 
 [DN11信息表](https://github.com/dn-11/metadata/blob/main/README.md)
+
+```mermaid
+graph RL
+这是一个mermaid测试用例 --> 你可以在这里写mermaid语法
+
+```
