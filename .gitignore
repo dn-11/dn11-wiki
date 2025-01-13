@@ -4,3 +4,5 @@ pnpm-lock.yaml
 *.log
 cache
 .temp
+package-lock.json
+.DS_Store
