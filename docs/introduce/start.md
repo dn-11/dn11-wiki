@@ -12,8 +12,31 @@ DN11全称为 “11号去中心化网络”（Decentralized Network 11），~~�
 
 [DN11信息表](https://github.com/dn-11/metadata/blob/main/README.md)
 
-```mermaid
-graph RL
-这是一个mermaid测试用例 --> 你可以在这里写mermaid语法
+新同学修网 RoadMap
 
+```mermaid
+flowchart TD
+    WireGuard --> EBGP
+    OpenVPN .-> EBGP
+    ... .-> EBGP
+
+    EBGP --网络质量--> BFD
+    BFD --> LargeCommunity
+
+    EBGP --路由安全--> ROA
+    ROA --> RPKI
+    
+    EBGP --内部网络--> OSPF
+    OSPF --> IBGP
+    IBGP --> RR
+    RR --> 多级RR
+    IBGP --> BGP联邦
+
+    EBGP --域名服务--> DNS分流
+    DNS分流 --> CA证书
+    CA证书 --> ACME
+    DNS分流 --> 权威DNS
+    权威DNS --> rDNS
+
+    DNS分流 --内容服务--> emby,pt,alist,...
 ```
