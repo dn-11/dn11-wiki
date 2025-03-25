@@ -1,5 +1,5 @@
 import PanguPlugin from "markdown-it-pangu";
-import { birdConf } from "./theme/shikiji";
+import { birdGrammar } from "./theme/shiki";
 import { withMermaid } from "vitepress-plugin-mermaid";
 import { defineConfig } from "vitepress";
 export default withMermaid(
@@ -50,11 +50,7 @@ export default withMermaid(
       config: (md) => {
         md.use(PanguPlugin);
       },
-      // 更新 vitepress 超过 1.4.2 后会出现故障
-      languages: [birdConf],
-      languageAlias: {
-        bird_conf: "bird",
-      },
+      languages: [birdGrammar],
     },
     themeConfig: {
       outline: [2, 6],
