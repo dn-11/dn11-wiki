@@ -80,25 +80,27 @@ export default withMermaid(
         {
           text: "接入",
           items: [
-            { text: "子网并入", link: "/connect/subnet" },
+            { text: "子网并入准备", link: "/connect/subnet" },
             { text: "BGP", link: "/connect/bgp" },
             { text: "IBGP", link: "/connect/ibgp" },
             { text: "BFD", link: "/connect/bfd" },
             { text: "Route Collector", link: "/connect/collector" },
             { text: "ROA / RPKI", link: "/connect/roa-rpki" },
-            { text: "Large Community", link: "/connect/large-community"}
+            { text: "Large Community", link: "/connect/large-community" }
           ],
         },
         {
-          text: "节点",
-          items: [{ text: "列表", link: "/peer/list" }],
-        },
-        {
-          text: "服务",
+          text: "内容",
           items: [
-            { text: "Samba", link: "/service/samba" },
-            { text: "Others", link: "/service/other" },
-          ],
+            {
+              text: "节点列表",
+              link: "https://github.com/hdu-dn11/metadata",
+            },
+            {
+              text: "服务",
+              link: "/service/other",
+            },
+          ]
         },
         {
           text: "其他",
@@ -106,7 +108,7 @@ export default withMermaid(
             { text: "DDNS", link: "/mics/ddns" },
             { text: "DNS", link: "/mics/dns" },
             { text: "RDNS", link: "/mics/rdns" },
-            { text: "CA", link: "/mics/ca"}
+            { text: "CA", link: "/mics/ca" }
           ],
         },
         {

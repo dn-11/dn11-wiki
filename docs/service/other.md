@@ -2,6 +2,8 @@
 
 ::: warning
 服务变的太快 此处可能是过时内容 仅做展示
+
+新版服务页见 <http://portal.syx.dn11>
 :::
 
 ::: tip
