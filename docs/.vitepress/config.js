@@ -82,6 +82,7 @@ export default withMermaid(
           items: [
             { text: "子网并入准备", link: "/connect/subnet" },
             { text: "BGP", link: "/connect/bgp" },
+            { text: "OSPF", link: "connect/ospf"},
             { text: "IBGP", link: "/connect/ibgp" },
             { text: "BFD", link: "/connect/bfd" },
             { text: "Route Collector", link: "/connect/collector" },
