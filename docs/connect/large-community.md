@@ -69,7 +69,7 @@ RouterOS 实现相关已经编写了对应的 README。
 
 用于 `11000`，目前仅中国大陆地区需要按要求设置，其他应设置为 11111
 
-参见 [GB/T 2260-2007](https://openstd.samr.gov.cn/bzgk/gb/newGbInfo?hcno=C9C488FD717AFDCD52157F41C3302C6D)
+参见 <https://zh.wikipedia.org/wiki/省级行政区#省级行政区列表>
 
 ::: warning IMPORTANT
 用于表示省级行政区的仅仅取前两位，如浙江省级行政区码为 `33` 而非 `330000`。
@@ -95,7 +95,7 @@ RouterOS 实现相关已经编写了对应的 README。
 
 用于 `11002`
 
-参见 [ISO3166](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes)
+参见 [ISO3166](https://zh.wikipedia.org/wiki/ISO_3166-1%E6%95%B0%E5%AD%97%E4%BB%A3%E7%A0%81#%E6%AD%A3%E5%BC%8F%E5%88%86%E9%85%8D%E4%BB%A3%E7%A0%81)
 
 #### 国际地区码
 
