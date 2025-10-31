@@ -63,6 +63,17 @@ BIRD 实现样例同时添加了其他 DN11 推荐配置（笔者注：OSPF 重�
 
 RouterOS 实现相关已经编写了对应的 README。
 
+:::details 为什么我的 bird 在报错？
+大概是 bird 不够新，推荐 `2.16` 以上，如果是你是 debian 系发行版，可以直接梭这个私有源
+
+```bash
+wget -O /usr/share/keyrings/cznic-labs-pkg.gpg https://pkg.labs.nic.cz/gpg
+echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/bird2 bookworm main" > /etc/apt/sources.list.d/cznic-labs-bird2.list
+apt update
+apt install -y bird2
+```
+:::
+
 ### 标准代码参考
 
 #### 省级行政区码 （仅中国大陆地区，不含港澳台）
