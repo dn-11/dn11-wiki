@@ -63,8 +63,8 @@ BIRD 实现样例同时添加了其他 DN11 推荐配置（笔者注：OSPF 重�
 
 RouterOS 实现相关已经编写了对应的 README。
 
-:::details 为什么我的 bird 在报错？
-由于 Large Community 使用了一些较新的 bird 特性，因此要求 bird 版本不低于 `2.14`, 推荐直接上 bird2 的最新版本 `2.17.1`，debian 系的发行版可以用这个私有源。
+:::details 为什么我的 Bird 在报错？
+由于 Large Community 使用了一些较新的 Bird 特性，因此要求 Bird 版本不低于 `2.14`, 推荐直接上 Bird2 的最新版本 `2.17.2`（但建议不要使用 Bird3），Debian/Ubuntu 系的发行版可以用这个私有源。
 
 <https://pkg.labs.nic.cz/doc/?project=bird>
 :::
@@ -75,7 +75,7 @@ RouterOS 实现相关已经编写了对应的 README。
 
 用于 `11000`，目前仅中国大陆地区需要按要求设置，其他应设置为 11111
 
-参见 <https://zh.wikipedia.org/wiki/省级行政区#省级行政区列表>
+参见 [省级行政区列表](https://zh.wikipedia.org/wiki/省级行政区#省级行政区列表)
 
 ::: warning IMPORTANT
 用于表示省级行政区的仅仅取前两位，如浙江省级行政区码为 `33` 而非 `330000`。
@@ -101,7 +101,7 @@ RouterOS 实现相关已经编写了对应的 README。
 
 用于 `11002`
 
-参见 [ISO3166](https://zh.wikipedia.org/wiki/ISO_3166-1%E6%95%B0%E5%AD%97%E4%BB%A3%E7%A0%81#%E6%AD%A3%E5%BC%8F%E5%88%86%E9%85%8D%E4%BB%A3%E7%A0%81)
+参见 [ISO3166](https://zh.wikipedia.org/wiki/ISO_3166-1数字代码)
 
 #### 国际地区码
 
