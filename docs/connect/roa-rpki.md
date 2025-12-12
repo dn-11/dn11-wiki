@@ -32,6 +32,9 @@ UNKNOWN 未知：路由公告没有 ROA
 stayrtr -checktime=false -bind=:323 -cache=https://metadata.dn11.baimeow.cn/dn11_roa_stayrtr.json
 ```
 
+> - Q: 为什么需要 `-checktime=false`
+> - A: 该选项会验证 RTR 文件的最后更新且应当于 24 小时内更新。DN11 的变更频率达不到也无需达到这个标准。
+
 kubernetes 可以参考
 
 ```YAML
@@ -192,3 +195,69 @@ crontab -e 添加以下内容：
 ```
 
 `5 3 * * *` 是每天凌晨3点5分执行一次，可以自行修改。
+
+## RPKI Over SSH
+
+### 创建 SSH Key
+
+```bash
+ssh-keygen
+```
+
+该命令是可交互的，请记得修改储存的位置。
+
+### StayRTR 配置
+
+```bash
+stayrtr -checktime=false -cache=https://metadata.dn11.baimeow.cn/dn11_roa_stayrtr.json -ssh.bind :8282 -ssh.key /somepath/private.pem -ssh.method.key=true -ssh.auth.key.bypass=true -ssh.auth.user rpki -bind ""
+```
+
+这里给出在和普通配置不同部分的解释：
+
+- `-ssh.bind :8282` 指定 SSH 的监听端口为 8282。
+- `-ssh.key /somepath/private.pem` 指定 SSH 的私钥。
+- `-ssh.method.key=true` 允许通过密钥验证连接。
+- `-ssh.auth.key.bypass=true` 允许任意 SSH Key 链接。
+- `-ssh.auth.user rpki` 指定 SSH 的用户为 rpki。
+- `-bind ""` 不监听普通 RTR 的端口。
+
+### Bird 配置
+
+对应的 bird 配置片段：
+
+```
+roa4 table r4;
+
+protocol rpki DN11_RPKI {
+        roa4 { table r4; };
+
+        remote x.x.x.x port 8282;
+
+        retry keep 1;
+        refresh keep 30;
+        expire 600;
+
+        transport ssh {
+                user "rpki";
+                bird private key "/etc/bird.d/private.pem";
+                remote public key "/etc/bird.d/rpki_public.pem";
+        };
+}
+```
+
+较普通配置只有几行修改。
+
+其中 `x.x.x.x` 为 stayrtr 监听的 IP 地址。
+
+bird 会要求你提供自己的 private key （第 14 行）和对端的 public key（第 15 行）。
+
+需要指出的是，此处的 public key 文件格式实际上是 `.ssh/authorized_keys` 的格式，即列出对端地址和其公钥指纹，如：
+
+```plain
+[172.16.20.1]:8282 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHA0ySnKyMp69ia5dTG2gCnexgzLauLl2hLdeifKkGNM
+```
+
+### Q&A
+
+- Q: bird 持续无法建立连接，且 StayRTR 的日志中有类似于 `ssh: disconnect, reason 11: Bye Bye` 的输出。
+- A: 考虑密钥（公钥和私钥）的权限（能否被 bird 读取？）和密钥格式问题。
