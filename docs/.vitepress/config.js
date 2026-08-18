@@ -80,6 +80,7 @@ export default withMermaid(
         {
           text: "接入",
           items: [
+            { text: "基础知识", link: "/connect/basic"},
             { text: "子网并入准备", link: "/connect/subnet" },
             { text: "BGP", link: "/connect/bgp" },
             { text: "OSPF", link: "connect/ospf"},
