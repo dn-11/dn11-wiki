@@ -75,9 +75,9 @@ export default withMermaid(
           text: "接入",
           items: [
             { text: "基础知识", link: "/connect/basic"},
-            { text: "子网并入准备", link: "/connect/subnet" },
+            { text: "申请注册", link: "/connect/request" },
             { text: "BGP", link: "/connect/bgp" },
-            { text: "OSPF", link: "connect/ospf"},
+            { text: "OSPF", link: "/connect/ospf"},
             { text: "IBGP", link: "/connect/ibgp" },
             { text: "BFD", link: "/connect/bfd" },
             { text: "Route Collector", link: "/connect/collector" },
@@ -109,7 +109,10 @@ export default withMermaid(
         },
         {
           text: "废弃内容",
-          items: [{ text: "ospf接入", link: "/dustbin/ospf" }],
+          items: [
+            { text: "ospf接入", link: "/dustbin/ospf" },
+            { text: "子网并入准备", link: "/dustbin/subnet" },
+          ],
         },
       ],
       search: {
