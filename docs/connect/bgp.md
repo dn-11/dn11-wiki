@@ -1,10 +1,16 @@
-# BGP组网
+# BGP 组网
+
+<PlatformTabs></PlatformTabs>
 
 ## 隧道
 
-> 本小节写给 Openwrt 用户，ros 用户应该都会，linux 用户参考 wg-quick 使用教程。但无论你是什么用户，请务必看完本章节的内容，铺设隧道这件事有一些实践上的做法可供参考。
+组网的第一步是铺设隧道，这里我们选用配置相对简单且应用广泛的 WireGuard 完成这部分的教学。
+
+<PlatformPanel name="openwrt">
 
 ### 安装 wg-quick-op
+
+luci-proto-wireguard 有一些功能性上的缺失，包括但不限于 DDNS, PostUp 脚本能力，无法满足 DN11 的需求，因此开发了一个新的 WireGuard 管理工具。
 
 wg-quick-op 是 openwrt 下一个专门用于配置 WireGuard 的工具，他会帮你处理开机启动、ddns 的问题的同时你可以使用 wg-quick 配置文件的所有配置。主要是基于 wg-quick-go 修改，定制了一些实用功能。
 
@@ -31,7 +37,23 @@ INFO[0000] add wg-quick-op to init.d success
 wg-quick-op 默认的输出log是ERROR级别的，如果你想看到更多的信息，修改`/etc/wg-quick-op.toml` 文件中的 `level` 为 `info` 即可
 :::
 
-### 配置隧道
+</PlatformPanel>
+
+<PlatformPanel name="linux">
+
+### 安装 WireGuard
+
+Linux 下以 Ubuntu 为例，直接使用标准的 wg-quick（包含在 wireguard-tools 包中）。Ubuntu 20.04 及以上的内核已内置 WireGuard 模块，安装工具即可：
+
+```bash
+apt update && apt install wireguard-tools
+```
+
+安装完成后系统会得到 `wg` 和 `wg-quick` 两个命令，配置文件统一放在 `/etc/wireguard/` 目录下。
+
+</PlatformPanel>
+
+### 编写配置文件
 
 在 `/etc/wireguard`下创建配置文件（没有这个文件夹的话需要创建），一条隧道对应一个配置文件,配置文件命名为 `xxx.conf`。下面给出配置文件示例:
 
@@ -60,33 +82,90 @@ AllowedIPs = 10.0.0.0/8, 100.64.0.0/10, 172.16.0.0/12, 192.168.0.0/16
 - PublicKey 填对面的公钥，公钥可用用 `wg pubkey`命令，然后粘贴**私钥**进去按 ctrl+d 获取
 - AllowedIPs 允许所有**内网** IP 通过 WireGuard 接口
 - MTU = 1388 如果你在杭电内网，设置为 1388 或更小，如果你在其他地方，设置为 1420
+
+<PlatformPanel name="openwrt">
+
 - MTU 可以在`/etc/wg-quick-op.toml`中统一配置，见[config-sample.toml](https://github.com/dn-11/wg-quick-op/blob/master/conf/config-sample.toml)
+
+</PlatformPanel>
+
+### 启动隧道
+
+<PlatformPanel name="openwrt">
 
 使用 `wg-quick-op up 接口名`来连接这个接口，没有意外的话，现在你能够 ping 通对面的对端IP了
 
-#### 故障排查
+开机自启已经在安装 wg-quick-op 时自动配置好，无需额外操作。
 
-### STEP1
+</PlatformPanel>
+
+<PlatformPanel name="linux">
+
+```bash
+# 启动隧道，「xxx」替换为 /etc/wireguard/ 下的配置文件名（不含 .conf 后缀）
+wg-quick up xxx
+
+# 关闭隧道
+wg-quick down xxx
+```
+
+没有意外的话，现在你能够 ping 通对面的对端IP了
+
+你还需要启动对应的 systemd unit 来实现开机启动
+
+```bash
+systemctl enable --now wg-quick@xxx
+```
+
+</PlatformPanel>
+
+### 故障排查
+
+**STEP1**
 
 首先你需要检查隧道有没有连接上，执行 `wg show 接口名`，看 latest handshake，如果握手时间在两分钟内都是正常的，如果大于两分钟或者没有这个字段，说明 WireGuard 连接没有连上。
 
-这一般是因为端口没开，检查路由器的入站配置，如果是旁路由，还得检查一下端口映射是否正确。这也有可能是DNS记录的地址过期导致的，检查一下 WireGuard 的 endpoint 地址是否确实是对面的IP地址。
+这一般是因为端口没开，检查防火墙的入站配置，如果是旁路由，还得检查一下端口映射是否正确。这也有可能是DNS记录的地址过期导致的，检查一下 WireGuard 的 endpoint 地址是否确实是对面的IP地址。
 
-### STEP2
+**STEP2**
 
 ping 对方隧道地址
 
 如果连接上了还是没有 ping 通，请检查路由表，有没有到对端的路由，并再次检查你的 WireGuard 配置并重启接口
 
-### STEP3
+**STEP3**
 
 有时候运营商会截掉某固定公钥的流量，这时候你可以尝试更换公钥
 
 ## BGP
 
-### 配置 bird2
+> 本小节以 bird2 为例，ros 和其他用户可供参考，但是依旧推荐阅读。
 
-> 本小节写给 bird2 用户，ros 和其他用户可供参考，但是依旧推荐阅读
+### 安装 bird2
+
+<PlatformPanel name="openwrt">
+
+```bash
+opkg update
+opkg install bird2 bird2c
+```
+
+- 配置文件位于 `/etc/bird.conf`
+- `birdc` 客户端由 bird2c 包提供
+
+</PlatformPanel>
+
+<PlatformPanel name="linux">
+
+推荐通过私有软件源安装最新版 bird2
+
+<https://pkg.labs.nic.cz/doc/?project=bird>
+
+- 配置文件位于 `/etc/bird/bird.conf`
+
+</PlatformPanel>
+
+### 编写 BGP 配置
 
 下面给出BGP配置示例，以下示例适用于AS内只有一台路由设备的配置，如果你的AS内有多个路由设备还要做不少额外配置，之后可以另外写一篇文章来谈谈这个问题
 

@@ -1,6 +1,8 @@
 import { h, watch } from 'vue'
 import Theme from 'vitepress/theme-without-fonts'
 import Layout from './Layout.vue'
+import PlatformTabs from './components/PlatformTabs.vue'
+import PlatformPanel from './components/PlatformPanel.vue'
 import './rainbow.css'
 import './style.css'
 
@@ -9,7 +11,10 @@ let homePageStyle
 export default {
   ...Theme,
   Layout: Layout,
-  enhanceApp({ router }) {
+  enhanceApp({ app, router }) {
+    app.component('PlatformTabs', PlatformTabs)
+    app.component('PlatformPanel', PlatformPanel)
+
     if (typeof window === 'undefined')
       return
 
