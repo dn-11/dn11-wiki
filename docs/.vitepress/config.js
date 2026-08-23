@@ -56,13 +56,7 @@ export default withMermaid(
       outline: [2, 6],
       nav: [
         { text: "首页", link: "/" },
-        {
-          text: "Status",
-          items: [
-            { text: "主站", link: "https://status.dn11.top" },
-            { text: "备站", link: "https://monitor.dn11.baimeow.cn" },
-          ],
-        },
+        { text: "实时拓扑", link: "https://status.dn11.top" },
         {
           text: "博客",
           items: [
